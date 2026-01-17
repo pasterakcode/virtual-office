@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase-server";
 
-
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
@@ -25,6 +24,12 @@ export async function GET(req: Request) {
 
   const data = await res.json();
 
+  // ⬇️ TO JEST KLUCZOWE
+  if (!data.ok) {
+    console.error("SLACK ERROR", data);
+    return NextResponse.json(data, { status: 400 });
+  }
+
   await supabaseServer.from("slack_auth").insert({
     access_token: data.access_token,
     team_id: data.team.id,
@@ -32,5 +37,4 @@ export async function GET(req: Request) {
   });
 
   return NextResponse.redirect("/admin");
-  
 }
