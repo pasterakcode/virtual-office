@@ -83,3 +83,23 @@ export default function DeskCard({ desk }: { desk: Desk }) {
     </div>
   );
 }
+
+const handleClick = () => {
+  console.log("CLICK", desk);
+
+  if (isOffline) {
+    console.log("BLOCK: offline");
+    return;
+  }
+
+  if (!desk.slackUserId) {
+    console.log("BLOCK: no slackUserId");
+    return;
+  }
+
+  window.open(
+    `https://slack.com/app_redirect?channel=${desk.slackUserId}`,
+    "_blank"
+  );
+};
+
