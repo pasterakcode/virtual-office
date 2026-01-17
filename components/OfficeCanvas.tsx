@@ -1,6 +1,7 @@
 "use client";
 
 import Desk from "./Desk";
+import { desks } from "../data/desks";
 
 export default function OfficeCanvas() {
   return (
@@ -18,9 +19,16 @@ export default function OfficeCanvas() {
         alignContent: "start",
       }}
     >
-      <Desk name="Anna" status="available" />
-      <Desk name="Bartek" status="busy" />
-      <Desk name="Kasia" status="offline" />
+      {desks.map((desk) => (
+        <Desk
+          key={desk.id}
+          name={desk.name}
+          presence={desk.presence}
+          status={desk.status}
+          unreadCount={desk.unreadCount}
+          slackUserId={desk.slackUserId}
+        />
+      ))}
     </section>
   );
 }
