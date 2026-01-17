@@ -12,8 +12,17 @@ export default function DeskCard({ desk }: { desk: Desk }) {
   const isOffline = desk.presence === "offline";
 
   const handleClick = () => {
-    if (isOffline) return;
-    if (!desk.slackUserId) return;
+    console.log("CLICK", desk);
+
+    if (isOffline) {
+      console.log("BLOCK: offline");
+      return;
+    }
+
+    if (!desk.slackUserId) {
+      console.log("BLOCK: no slackUserId");
+      return;
+    }
 
     window.open(
       `https://slack.com/app_redirect?channel=${desk.slackUserId}`,
@@ -35,7 +44,6 @@ export default function DeskCard({ desk }: { desk: Desk }) {
         transition: "all 0.2s ease",
       }}
     >
-      {/* Avatar */}
       <div
         style={{
           width: 56,
@@ -83,23 +91,3 @@ export default function DeskCard({ desk }: { desk: Desk }) {
     </div>
   );
 }
-
-const handleClick = () => {
-  console.log("CLICK", desk);
-
-  if (isOffline) {
-    console.log("BLOCK: offline");
-    return;
-  }
-
-  if (!desk.slackUserId) {
-    console.log("BLOCK: no slackUserId");
-    return;
-  }
-
-  window.open(
-    `https://slack.com/app_redirect?channel=${desk.slackUserId}`,
-    "_blank"
-  );
-};
-
