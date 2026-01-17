@@ -24,18 +24,33 @@ export default function AdminPage() {
       <h1>Admin</h1>
       <p>Select users to show on Teamfloor</p>
 
-      {users.map((u) => (
-        <label key={u.id} style={{ display: "block", marginTop: 8 }}>
-          <input
-            type="checkbox"
-            checked={!!selected[u.id]}
-            onChange={(e) =>
-              setSelected({ ...selected, [u.id]: e.target.checked })
-            }
-          />{" "}
-          {u.name}
-        </label>
-      ))}
+{users.map((u) => (
+  <label
+    key={u.id}
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 8,
+    }}
+  >
+    <input
+      type="checkbox"
+      checked={!!selected[u.id]}
+      onChange={(e) =>
+        setSelected({ ...selected, [u.id]: e.target.checked })
+      }
+    />
+    <span>
+      <strong>{u.name}</strong>{" "}
+      <span style={{ color: "#666", fontSize: 13 }}>
+        ({u.email})
+      </span>
+    </span>
+  </label>
+))}
+
+
     </main>
   );
 }
