@@ -13,8 +13,14 @@ export default function Home() {
   const [adminOpen, setAdminOpen] = useState(false);
 
   useEffect(() => {
+    let channel: any;
+
     const load = async () => {
-      const { data } = await supabase.from("desks").select("*");
+      console.log("[Home] loading desks");
+
+      const { data, error } = await supabase.from("desks").select("*");
+
+      console.log("[Home] desks loaded:", data, error);
 
       const normalized: Desk[] = (data ?? []).map((d) => ({
         id: d.id,
@@ -29,7 +35,32 @@ export default function Home() {
       setDesks(normalized);
     };
 
+    // initial load
     load();
+
+    // realtime subscription
+    console.log("[Home] subscribing to desks realtime");
+
+    channel = supabase
+      .channel("desks-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "desks" },
+        (payload) => {
+          console.log("[Home] realtime event:", payload);
+          load();
+        }
+      )
+      .subscribe((status) => {
+        console.log("[Home] realtime status:", status);
+      });
+
+    return () => {
+      console.log("[Home] cleanup realtime");
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, []);
 
   return (
