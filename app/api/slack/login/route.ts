@@ -1,5 +1,13 @@
 import { NextResponse } from "next/server";
 
 export async function GET() {
-  return NextResponse.json({ ok: true });
+  const params = new URLSearchParams({
+    client_id: process.env.SLACK_CLIENT_ID!,
+    scope: "users:read",
+    redirect_uri: process.env.SLACK_REDIRECT_URI!,
+  });
+
+  return NextResponse.redirect(
+    `https://slack.com/oauth/v2/authorize?${params.toString()}`
+  );
 }
