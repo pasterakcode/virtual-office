@@ -8,20 +8,24 @@ export default function Home() {
         backgroundColor: "#f5f5f5",
       }}
     >
-      <h1 style={{ marginBottom: "8px" }}>Virtual Office</h1>
-      <p style={{ marginBottom: "32px", color: "#555" }}>
-        Team availability at a glance
-      </p>
+      {/* Header */}
+      <header style={{ marginBottom: "32px" }}>
+        <h1 style={{ marginBottom: "6px" }}>Teamfloor</h1>
+        <p style={{ color: "#555" }}>
+          See your team. Talk instantly.
+        </p>
+      </header>
 
       {/* Office canvas */}
-      <div
+      <section
         style={{
           width: "100%",
-          height: "500px",
+          height: "520px",
           backgroundColor: "#ffffff",
           border: "1px solid #ddd",
-          borderRadius: "8px",
+          borderRadius: "10px",
           position: "relative",
+          padding: "16px",
         }}
       >
         <p
@@ -31,11 +35,12 @@ export default function Home() {
             left: "50%",
             transform: "translate(-50%, -50%)",
             color: "#999",
+            fontSize: "14px",
           }}
         >
-          Office space (coming next)
+          Teamfloor workspace (desks coming next)
         </p>
-      </div>
+      </section>
     </main>
   );
 }
