@@ -9,13 +9,25 @@ import type { Desk } from "@/types/desk";
 export default function Home() {
   const [desks, setDesks] = useState<Desk[]>([]);
 
-  useEffect(() => {
-    const load = async () => {
-      const { data } = await supabase.from("desks").select("*");
-      setDesks(data ?? []);
-    };
-    load();
-  }, []);
+useEffect(() => {
+  const load = async () => {
+    const { data } = await supabase.from("desks").select("*");
+
+    const normalized: Desk[] = (data ?? []).map((d) => ({
+      id: d.id,
+      name: d.name,
+      presence:
+        d.presence === "online" || d.presence === "busy"
+          ? d.presence
+          : "offline",
+    }));
+
+    setDesks(normalized);
+  };
+
+  load();
+}, []);
+
 
   return (
     <main
