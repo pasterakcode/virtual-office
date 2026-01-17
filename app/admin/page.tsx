@@ -5,7 +5,9 @@ import { useEffect, useState } from "react";
 type SlackUser = {
   id: string;
   name: string;
+  email: string;
 };
+
 
 export default function AdminPage() {
   const [users, setUsers] = useState<SlackUser[]>([]);
