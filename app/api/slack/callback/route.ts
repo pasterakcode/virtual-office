@@ -39,4 +39,12 @@ export async function GET(req: Request) {
 
     if (error) {
       console.error("SUPABASE ERROR", error);
-      return Ne
+      return NextResponse.json(error, { status: 500 });
+    }
+
+    return NextResponse.redirect("/admin");
+  } catch (e) {
+    console.error("CALLBACK CRASH", e);
+    return NextResponse.json({ error: "callback crashed" }, { status: 500 });
+  }
+}
