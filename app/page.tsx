@@ -13,14 +13,17 @@ useEffect(() => {
   const load = async () => {
     const { data } = await supabase.from("desks").select("*");
 
-    const normalized: Desk[] = (data ?? []).map((d) => ({
-      id: d.id,
-      name: d.name,
-      presence:
-        d.presence === "online" || d.presence === "busy"
-          ? d.presence
-          : "offline",
-    }));
+
+const normalized: Desk[] = (data ?? []).map((d) => ({
+  id: d.id,
+  name: d.name,
+  presence:
+    d.presence === "online" || d.presence === "busy"
+      ? d.presence
+      : "offline",
+
+  slackUserId: d.slack_user_id ?? undefined,
+}));
 
     setDesks(normalized);
   };
