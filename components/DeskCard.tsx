@@ -1,18 +1,29 @@
 "use client";
 
-import type { Desk } from "@/types/desk";
+import type { Desk, DeskPresence } from "@/types/desk";
 
-const statusColor: Record<Desk["presence"], string> = {
+const statusColor: Record<DeskPresence, string> = {
   online: "#2ecc71",
   busy: "#f39c12",
-  offline: "#bdc3c7"
+  offline: "#bdc3c7",
 };
 
 export default function DeskCard({ desk }: { desk: Desk }) {
   const isOffline = desk.presence === "offline";
 
+  const handleClick = () => {
+    if (isOffline) return;
+    if (!desk.slackUserId) return;
+
+    window.open(
+      `https://slack.com/app_redirect?channel=${desk.slackUserId}`,
+      "_blank"
+    );
+  };
+
   return (
     <div
+      onClick={handleClick}
       style={{
         padding: 24,
         borderRadius: 18,
@@ -21,10 +32,10 @@ export default function DeskCard({ desk }: { desk: Desk }) {
         boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
         opacity: isOffline ? 0.35 : 1,
         cursor: isOffline ? "default" : "pointer",
-        transition: "all 0.2s ease"
+        transition: "all 0.2s ease",
       }}
     >
-      {/* Avatar placeholder */}
+      {/* Avatar */}
       <div
         style={{
           width: 56,
@@ -36,7 +47,7 @@ export default function DeskCard({ desk }: { desk: Desk }) {
           justifyContent: "center",
           color: "#fff",
           fontWeight: 600,
-          fontSize: 20
+          fontSize: 20,
         }}
       >
         {desk.name.charAt(0)}
@@ -51,11 +62,23 @@ export default function DeskCard({ desk }: { desk: Desk }) {
           style={{
             marginTop: 6,
             fontSize: 13,
-            color: isOffline ? "#999" : "#333"
+            color: isOffline ? "#999" : "#333",
           }}
         >
           {desk.presence}
         </div>
+
+        {!isOffline && (
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 12,
+              color: "#2563eb",
+            }}
+          >
+            {desk.presence === "busy" ? "View status" : "Talk"}
+          </div>
+        )}
       </div>
     </div>
   );
