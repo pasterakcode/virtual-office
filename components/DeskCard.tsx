@@ -1,10 +1,6 @@
 "use client";
 
-type Desk = {
-  id: string;
-  name: string;
-  presence: "online" | "busy" | "offline";
-};
+import type { Desk } from "@/types/desk";
 
 const statusColor: Record<Desk["presence"], string> = {
   online: "#2ecc71",
