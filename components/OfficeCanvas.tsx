@@ -1,4 +1,5 @@
-import Desk from "@/components/Desk";
+import Desk from "./Desk";
+
 
 export default function OfficeCanvas() {
   return (
