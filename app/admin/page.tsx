@@ -13,11 +13,21 @@ export default function AdminPage() {
   const [users, setUsers] = useState<SlackUser[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
 
-  useEffect(() => {
-    fetch("/api/slack/users")
-      .then((r) => r.json())
-      .then(setUsers);
-  }, []);
+useEffect(() => {
+  fetch("/api/slack/users")
+    .then((r) => {
+      if (!r.ok) return null;
+      return r.json();
+    })
+    .then((data) => {
+      if (!Array.isArray(data)) {
+        setUsers([]);
+        return;
+      }
+      setUsers(data);
+    });
+}, []);
+
 
   return (
     <main style={{ padding: 32 }}>
