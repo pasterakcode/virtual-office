@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import OfficeCanvas from "@/components/OfficeCanvas";
 
+<main style={{ padding: 32, background: "#f7f7f7", minHeight: "100vh" }}>
+
 type Desk = {
   id: string;
   name: string;
