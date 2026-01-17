@@ -1,9 +1,9 @@
 "use client";
 
-import Desk from "./Desk";
-import { desks } from "../data/desks";
+import DeskComponent from "./Desk";
+import { Desk } from "../data/desks";
 
-export default function OfficeCanvas() {
+export default function OfficeCanvas({ desks }: { desks: Desk[] }) {
   return (
     <section
       style={{
@@ -20,7 +20,7 @@ export default function OfficeCanvas() {
       }}
     >
       {desks.map((desk) => (
-        <Desk
+        <DeskComponent
           key={desk.id}
           name={desk.name}
           presence={desk.presence}
