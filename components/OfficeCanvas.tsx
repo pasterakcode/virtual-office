@@ -1,5 +1,6 @@
-import Desk from "./Desk";
+"use client";
 
+import Desk from "./Desk";
 
 export default function OfficeCanvas() {
   return (
