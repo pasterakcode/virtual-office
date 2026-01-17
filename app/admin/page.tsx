@@ -1,22 +1,39 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
+type SlackUser = {
+  id: string;
+  name: string;
+};
+
 export default function AdminPage() {
+  const [users, setUsers] = useState<SlackUser[]>([]);
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    fetch("/api/slack/users")
+      .then((r) => r.json())
+      .then(setUsers);
+  }, []);
+
   return (
     <main style={{ padding: 32 }}>
-      <h1>Admin Panel</h1>
+      <h1>Admin</h1>
+      <p>Select users to show on Teamfloor</p>
 
-      <a href="/api/slack/login">
-        <button
-          style={{
-            marginTop: 16,
-            padding: "10px 16px",
-            fontSize: 14,
-            cursor: "pointer",
-          }}
-        >
-          Connect Slack Workspace
-        </button>
-      </a>
+      {users.map((u) => (
+        <label key={u.id} style={{ display: "block", marginTop: 8 }}>
+          <input
+            type="checkbox"
+            checked={!!selected[u.id]}
+            onChange={(e) =>
+              setSelected({ ...selected, [u.id]: e.target.checked })
+            }
+          />{" "}
+          {u.name}
+        </label>
+      ))}
     </main>
   );
 }
