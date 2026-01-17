@@ -41,8 +41,11 @@ export async function GET(req: Request) {
       console.error("SUPABASE ERROR", error);
       return NextResponse.json(error, { status: 500 });
     }
+return NextResponse.redirect(
+  new URL("/admin", process.env.NEXT_PUBLIC_APP_URL!)
+);
 
-    return NextResponse.redirect("/admin");
+  
   } catch (e) {
     console.error("CALLBACK CRASH", e);
     return NextResponse.json({ error: "callback crashed" }, { status: 500 });
