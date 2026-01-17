@@ -6,6 +6,8 @@ import OfficeCanvas from "@/components/OfficeCanvas";
 import AdminPanel from "@/components/AdminPanel";
 import type { Desk } from "@/types/desk";
 
+const ADMIN_WIDTH = 320;
+
 export default function Home() {
   const [desks, setDesks] = useState<Desk[]>([]);
   const [adminOpen, setAdminOpen] = useState(false);
@@ -32,25 +34,54 @@ export default function Home() {
 
   return (
     <>
-      {/* ADMIN TOGGLE */}
+      {/* ADMIN BUTTON */}
       <button
-        onClick={() => setAdminOpen(true)}
+        onClick={() => setAdminOpen((v) => !v)}
         style={{
           position: "fixed",
           top: 16,
           left: 16,
-          zIndex: 50,
+          zIndex: 100,
+          padding: "8px 14px",
+          background: "#4A154B",
+          color: "#fff",
+          borderRadius: 6,
+          border: "none",
+          fontWeight: 600,
+          cursor: "pointer",
         }}
       >
-        ⚙️ Admin
+        {adminOpen ? "Close Admin" : "Admin"}
       </button>
 
-      {/* MAIN APP */}
+      {/* ADMIN PANEL */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: ADMIN_WIDTH,
+          height: "100vh",
+          transform: adminOpen
+            ? "translateX(0)"
+            : `translateX(-${ADMIN_WIDTH}px)`,
+          transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+          zIndex: 50,
+          background: "#fff",
+          borderRight: "1px solid #e5e7eb",
+        }}
+      >
+        <AdminPanel />
+      </div>
+
+      {/* MAIN WORKSPACE */}
       <main
         style={{
           padding: 32,
           background: "#f7f7f7",
           minHeight: "100vh",
+          marginLeft: adminOpen ? ADMIN_WIDTH : 0,
+          transition: "margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
         }}
       >
         <h1>Teamfloor</h1>
@@ -58,32 +89,6 @@ export default function Home() {
 
         <OfficeCanvas desks={desks} />
       </main>
-
-      {/* ADMIN PANEL OVERLAY */}
-      {adminOpen && (
-        <>
-          <div
-            onClick={() => setAdminOpen(false)}
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.3)",
-              zIndex: 40,
-            }}
-          />
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              zIndex: 50,
-              height: "100vh",
-            }}
-          >
-            <AdminPanel />
-          </div>
-        </>
-      )}
     </>
   );
 }
