@@ -1,3 +1,5 @@
+import Desk from "@/components/Desk";
+
 export default function OfficeCanvas() {
   return (
     <section
@@ -7,22 +9,16 @@ export default function OfficeCanvas() {
         backgroundColor: "#ffffff",
         border: "1px solid #ddd",
         borderRadius: "10px",
-        position: "relative",
-        padding: "16px",
+        padding: "24px",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+        gap: "24px",
+        alignContent: "start",
       }}
     >
-      <p
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          color: "#999",
-          fontSize: "14px",
-        }}
-      >
-        Teamfloor workspace (desks coming next)
-      </p>
+      <Desk name="Anna" status="available" />
+      <Desk name="Bartek" status="busy" />
+      <Desk name="Kasia" status="offline" />
     </section>
   );
 }
