@@ -3,12 +3,6 @@
 import type { Desk } from "@/types/desk";
 import DeskCard from "./DeskCard";"use client";
 
-type Desk = {
-  id: string;
-  name: string;
-  presence: "online" | "busy" | "offline";
-};
-
 export default function OfficeCanvas({ desks }: { desks: Desk[] }) {
   return (
     <section
