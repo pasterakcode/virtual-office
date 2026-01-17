@@ -40,6 +40,19 @@ const normalized: Desk[] = (data ?? []).map((d) => ({
         minHeight: "100vh"
       }}
     >
+      <a
+  href="/admin"
+  style={{
+    display: "inline-block",
+    marginTop: 12,
+    fontSize: 14,
+    color: "#2563eb",
+    textDecoration: "underline",
+  }}
+>
+  Admin panel
+</a>
+
       <h1>Teamfloor</h1>
       <p>See your team. Talk instantly.</p>
 
