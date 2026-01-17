@@ -1,7 +1,10 @@
+"use client";
+
 type DeskProps = {
   name: string;
   status: "available" | "busy" | "offline";
 };
+
 
 const statusColor: Record<DeskProps["status"], string> = {
   available: "#2ecc71",
