@@ -25,12 +25,14 @@ export async function GET() {
     return NextResponse.json(data, { status: 400 });
   }
 
-  const users = data.members
-    .filter((u: any) => !u.is_bot && !u.deleted)
-    .map((u: any) => ({
-      id: u.id,
-      name: u.real_name || u.name,
-    }));
+ const users = data.members
+  .filter((u: any) => !u.is_bot && !u.deleted)
+  .map((u: any) => ({
+    id: u.id,
+    name: u.real_name || u.name,
+    email: u.profile?.email ?? "",
+  }));
+
 
   return NextResponse.json(users);
 }
