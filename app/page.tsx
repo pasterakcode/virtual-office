@@ -77,6 +77,7 @@ export default function Home() {
       {/* MAIN WORKSPACE */}
       <main
         style={{
+          marginTop: 50,
           padding: 32,
           background: "#f7f7f7",
           minHeight: "100vh",
