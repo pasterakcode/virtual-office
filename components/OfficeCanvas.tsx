@@ -1,6 +1,7 @@
 "use client";
 
-import DeskCard from "./DeskCard";
+import type { Desk } from "@/types/desk";
+import DeskCard from "./DeskCard";"use client";
 
 type Desk = {
   id: string;
