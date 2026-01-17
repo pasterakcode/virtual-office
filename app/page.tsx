@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import OfficeCanvas from "@/components/OfficeCanvas";
 
-type Desk = {
-  id: string;
-  name: string;
-  presence: string;
-};
+import type { Desk } from "@/types/desk";
 
 export default function Home() {
   const [desks, setDesks] = useState<Desk[]>([]);
