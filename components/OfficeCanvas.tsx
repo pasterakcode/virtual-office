@@ -1,7 +1,7 @@
 "use client";
 
 import type { Desk } from "@/types/desk";
-import DeskCard from "./DeskCard";"use client";
+import DeskCard from "./DeskCard";
 
 export default function OfficeCanvas({ desks }: { desks: Desk[] }) {
   return (
