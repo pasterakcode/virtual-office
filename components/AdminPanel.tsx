@@ -15,49 +15,35 @@ export default function AdminPanel() {
   const [slackConnected, setSlackConnected] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔄 manual refresh state
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshResult, setRefreshResult] =
+    useState<"ok" | "error" | null>(null);
+
   // 1️⃣ sprawdź czy Slack jest podłączony
   useEffect(() => {
-    console.log("[AdminPanel] checking slack status");
-
     fetch("/api/slack/status")
       .then((r) => r.json())
-      .then((data) => {
-        console.log("[AdminPanel] slack status response:", data);
-        setSlackConnected(data.connected);
-      });
+      .then((data) => setSlackConnected(data.connected));
   }, []);
 
-  // 2️⃣ pobierz użytkowników Slacka (jeśli połączony)
+  // 2️⃣ pobierz użytkowników Slacka
   useEffect(() => {
     if (!slackConnected) return;
-
-    console.log("[AdminPanel] slack connected, loading users");
 
     fetch("/api/slack/users")
       .then((r) => r.json())
       .then((data) => {
-        console.log("[AdminPanel] slack users response:", data);
-
-        if (Array.isArray(data)) {
-          setUsers(data);
-        } else {
-          console.warn("[AdminPanel] users response is not an array");
-        }
+        if (Array.isArray(data)) setUsers(data);
       });
   }, [slackConnected]);
 
-  // 3️⃣ pobierz istniejące biurka → zaznacz checkboxy
+  // 3️⃣ pobierz istniejące biurka
   useEffect(() => {
     if (!slackConnected) return;
 
     const loadDesks = async () => {
-      console.log("[AdminPanel] loading existing desks from Supabase");
-
-      const { data, error } = await supabase
-        .from("desks")
-        .select("id");
-
-      console.log("[AdminPanel] desks select result:", { data, error });
+      const { data } = await supabase.from("desks").select("id");
 
       const map: Record<string, boolean> = {};
       (data ?? []).forEach((d) => {
@@ -70,6 +56,32 @@ export default function AdminPanel() {
 
     loadDesks();
   }, [slackConnected]);
+
+  // 🔄 ręczna aktualizacja statusów
+  const refreshStatuses = async () => {
+    try {
+      setRefreshing(true);
+      setRefreshResult(null);
+
+      const res = await fetch("/api/slack/presence", {
+        method: "POST",
+      });
+
+      if (!res.ok) {
+        throw new Error("Request failed");
+      }
+
+      setRefreshResult("ok");
+    } catch (e) {
+      console.error("Presence refresh error", e);
+      setRefreshResult("error");
+    } finally {
+      setRefreshing(false);
+
+      // chowamy komunikat po 3s
+      setTimeout(() => setRefreshResult(null), 3000);
+    }
+  };
 
   return (
     <div
@@ -105,6 +117,55 @@ export default function AdminPanel() {
         </a>
       )}
 
+      {slackConnected === true && (
+        <>
+          {/* 🔄 REFRESH BUTTON */}
+          <div style={{ marginTop: 16 }}>
+            <button
+              onClick={refreshStatuses}
+              disabled={refreshing}
+              style={{
+                width: "100%",
+                padding: "8px 12px",
+                borderRadius: 8,
+                border: "1px solid #e5e7eb",
+                background: refreshing ? "#f3f4f6" : "#fff",
+                cursor: refreshing ? "default" : "pointer",
+                fontWeight: 600,
+              }}
+            >
+              {refreshing
+                ? "Updating statuses…"
+                : "🔄 Update statuses from Slack"}
+            </button>
+
+            {refreshResult === "ok" && (
+              <div
+                style={{
+                  marginTop: 6,
+                  fontSize: 12,
+                  color: "#16a34a",
+                }}
+              >
+                Statuses updated successfully
+              </div>
+            )}
+
+            {refreshResult === "error" && (
+              <div
+                style={{
+                  marginTop: 6,
+                  fontSize: 12,
+                  color: "#dc2626",
+                }}
+              >
+                Failed to update statuses
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
       {slackConnected === true && loading && <p>Loading users…</p>}
 
       {slackConnected === true &&
@@ -116,7 +177,7 @@ export default function AdminPanel() {
               display: "flex",
               alignItems: "flex-start",
               gap: 8,
-              marginTop: 10,
+              marginTop: 12,
               cursor: "pointer",
             }}
           >
@@ -126,39 +187,20 @@ export default function AdminPanel() {
               onChange={async (e) => {
                 const checked = e.target.checked;
 
-                console.log("[AdminPanel] checkbox change", {
-                  slackUserId: u.id,
-                  checked,
-                  user: u,
-                });
-
                 setSelected((prev) => ({
                   ...prev,
                   [u.id]: checked,
                 }));
 
                 if (checked) {
-                  console.log("[AdminPanel] INSERT desk");
-
-                  const { error } = await supabase
-                    .from("desks")
-                    .upsert({
-                      id: u.id,
-                      slack_user_id: u.id,
-                      name: u.name,
-                      presence: "offline",
-                    });
-
-                  console.log("[AdminPanel] INSERT result:", error);
+                  await supabase.from("desks").upsert({
+                    id: u.id,
+                    slack_user_id: u.id,
+                    name: u.name,
+                    presence: "offline",
+                  });
                 } else {
-                  console.log("[AdminPanel] DELETE desk");
-
-                  const { error } = await supabase
-                    .from("desks")
-                    .delete()
-                    .eq("id", u.id);
-
-                  console.log("[AdminPanel] DELETE result:", error);
+                  await supabase.from("desks").delete().eq("id", u.id);
                 }
               }}
             />
