@@ -15,57 +15,74 @@ export default function AdminPanel() {
   const [slackConnected, setSlackConnected] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // 1️⃣ sprawdź czy Slack jest podłączony
-  useEffect(() => {
-    console.log("[AdminPanel] checking slack status");
+  // 🔴 LOGOUT FROM SLACK
+  const logoutSlack = async () => {
+    if (!confirm("Disconnect Slack?")) return;
 
+    const res = await fetch("/api/slack/logout", {
+      method: "POST",
+    });
+
+    const data = await res.json();
+
+    if (!data.ok) {
+      alert("Slack logout failed");
+      return;
+    }
+
+    setSlackConnected(false);
+    setUsers([]);
+    setSelected({});
+    setLoading(true);
+  };
+
+  // 1️⃣ check slack connection status
+  useEffect(() => {
     fetch("/api/slack/status")
       .then((r) => r.json())
       .then((data) => {
-        console.log("[AdminPanel] slack status response:", data);
         setSlackConnected(data.connected);
       });
   }, []);
 
-  // 2️⃣ pobierz użytkowników Slacka (jeśli połączony)
+  // 2️⃣ load slack users
   useEffect(() => {
-    if (!slackConnected) return;
+    if (slackConnected !== true) return;
 
-    console.log("[AdminPanel] slack connected, loading users");
+    setLoading(true);
 
     fetch("/api/slack/users")
       .then((r) => r.json())
       .then((data) => {
-        console.log("[AdminPanel] slack users response:", data);
-
         if (Array.isArray(data)) {
           setUsers(data);
         } else {
-          console.warn("[AdminPanel] users response is not an array");
+          setUsers([]);
         }
+        setLoading(false);
       });
   }, [slackConnected]);
 
-  // 3️⃣ pobierz istniejące biurka → zaznacz checkboxy
+  // 3️⃣ load existing desks
   useEffect(() => {
-    if (!slackConnected) return;
+    if (slackConnected !== true) return;
 
     const loadDesks = async () => {
-      console.log("[AdminPanel] loading existing desks from Supabase");
-
       const { data, error } = await supabase
         .from("desks")
         .select("id");
 
-      console.log("[AdminPanel] desks select result:", { data, error });
+      if (error || !data) {
+        setSelected({});
+        return;
+      }
 
       const map: Record<string, boolean> = {};
-      (data ?? []).forEach((d) => {
+      data.forEach((d) => {
         map[d.id] = true;
       });
 
       setSelected(map);
-      setLoading(false);
     };
 
     loadDesks();
@@ -105,6 +122,26 @@ export default function AdminPanel() {
         </a>
       )}
 
+      {slackConnected === true && (
+        <button
+          onClick={logoutSlack}
+          style={{
+            marginTop: 12,
+            marginBottom: 16,
+            width: "100%",
+            padding: "8px 12px",
+            background: "#e11d48",
+            color: "#fff",
+            border: "none",
+            borderRadius: 6,
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
+          Logout from Slack
+        </button>
+      )}
+
       {slackConnected === true && loading && <p>Loading users…</p>}
 
       {slackConnected === true &&
@@ -126,39 +163,26 @@ export default function AdminPanel() {
               onChange={async (e) => {
                 const checked = e.target.checked;
 
-                console.log("[AdminPanel] checkbox change", {
-                  slackUserId: u.id,
-                  checked,
-                  user: u,
-                });
-
                 setSelected((prev) => ({
                   ...prev,
                   [u.id]: checked,
                 }));
 
                 if (checked) {
-                  console.log("[AdminPanel] INSERT desk");
-
-                  const { error } = await supabase
-                    .from("desks")
-                    .upsert({
+                  await supabase.from("desks").upsert(
+                    {
                       id: u.id,
                       slack_user_id: u.id,
                       name: u.name,
                       presence: "offline",
-                    });
-
-                  console.log("[AdminPanel] INSERT result:", error);
+                    },
+                    { onConflict: "id" }
+                  );
                 } else {
-                  console.log("[AdminPanel] DELETE desk");
-
-                  const { error } = await supabase
+                  await supabase
                     .from("desks")
                     .delete()
                     .eq("id", u.id);
-
-                  console.log("[AdminPanel] DELETE result:", error);
                 }
               }}
             />
