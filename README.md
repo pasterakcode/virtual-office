@@ -2,6 +2,12 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+Copy the example env file and fill in your Slack credentials:
+
+```bash
+cp .env.example .env.local
+```
+
 First, run the development server:
 
 ```bash
