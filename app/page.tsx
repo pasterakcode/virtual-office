@@ -1,151 +1,126 @@
 "use client";
 
-import { useState } from "react";
-import OfficeCanvas from "../components/OfficeCanvas";
-import { Desk } from "../data/desks";
-import { desks as initialDesks } from "../data/desks";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import OfficeCanvas from "@/components/OfficeCanvas";
+import AdminPanel from "@/components/AdminPanel";
+import type { Desk } from "@/types/desk";
+
+const ADMIN_WIDTH = 320;
 
 export default function Home() {
-  const [isAdmin] = useState(true);
-  const [desks, setDesks] = useState<Desk[]>(initialDesks);
-  const [showAdmin, setShowAdmin] = useState(false);
+  const [desks, setDesks] = useState<Desk[]>([]);
+  const [adminOpen, setAdminOpen] = useState(false);
 
-  const toggleDeskStatus = (id: string) => {
-    setDesks((prev) =>
-      prev.map((desk) =>
-        desk.id === id
-          ? {
-              ...desk,
-              status:
-                desk.status === "active" ? "inactive" : "active",
-            }
-          : desk
+  useEffect(() => {
+    let channel: any;
+
+    const load = async () => {
+      console.log("[Home] loading desks");
+
+      const { data, error } = await supabase.from("desks").select("*");
+
+      console.log("[Home] desks loaded:", data, error);
+
+      const normalized: Desk[] = (data ?? []).map((d) => ({
+        id: d.id,
+        name: d.name,
+        presence:
+          d.presence === "online" || d.presence === "busy"
+            ? d.presence
+            : "offline",
+        slackUserId: d.slack_user_id ?? undefined,
+      }));
+
+      setDesks(normalized);
+    };
+
+    // initial load
+    load();
+
+    // realtime subscription
+    console.log("[Home] subscribing to desks realtime");
+
+    channel = supabase
+      .channel("desks-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "desks" },
+        (payload) => {
+          console.log("[Home] realtime event:", payload);
+          load();
+        }
       )
-    );
-  };
+      .subscribe((status) => {
+        console.log("[Home] realtime status:", status);
+      });
 
-  const addDesk = () => {
-    setDesks((prev) => [
-      ...prev,
-      {
-        id: Date.now().toString(),
-        slackUserId: "U_NEW",
-        name: "New user",
-        status: "inactive",
-        presence: "offline",
-        unreadCount: 0,
-      },
-    ]);
-  };
+    return () => {
+      console.log("[Home] cleanup realtime");
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, []);
 
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        padding: "40px",
-        fontFamily: "Arial, sans-serif",
-        backgroundColor: "#f5f5f5",
-        display: "flex",
-        gap: "24px",
-      }}
-    >
-      {/* Main area */}
-      <div style={{ flex: 1 }}>
-        <header
-          style={{
-            marginBottom: "24px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div>
-            <h1 style={{ marginBottom: "6px" }}>Teamfloor</h1>
-            <p style={{ color: "#555" }}>
-              See your team. Talk instantly.
-            </p>
-          </div>
+    <>
+      {/* ADMIN BUTTON */}
+      <button
+        onClick={() => setAdminOpen((v) => !v)}
+        style={{
+          position: "fixed",
+          top: 16,
+          left: 16,
+          zIndex: 100,
+          padding: "8px 14px",
+          background: "#4A154B",
+          color: "#fff",
+          borderRadius: 6,
+          border: "none",
+          fontWeight: 600,
+          cursor: "pointer",
+        }}
+      >
+        {adminOpen ? "Close Admin" : "Admin"}
+      </button>
 
-          {isAdmin && (
-            <button
-              onClick={() => setShowAdmin((v) => !v)}
-              style={{
-                padding: "8px 14px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-                backgroundColor: "#fff",
-                cursor: "pointer",
-              }}
-            >
-              {showAdmin ? "Close admin" : "Admin mode"}
-            </button>
-          )}
-        </header>
-
-        <OfficeCanvas desks={desks} />
+      {/* ADMIN PANEL */}
+      <div
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: ADMIN_WIDTH,
+          height: "100vh",
+          transform: adminOpen
+            ? "translateX(0)"
+            : `translateX(-${ADMIN_WIDTH}px)`,
+          transition: "transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+          zIndex: 50,
+          background: "#fff",
+          borderRight: "1px solid #e5e7eb",
+        }}
+      >
+        <AdminPanel />
       </div>
 
-      {/* Admin panel */}
-      {showAdmin && (
-        <aside
-          style={{
-            width: "280px",
-            backgroundColor: "#ffffff",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-            padding: "16px",
-          }}
-        >
-          <h3 style={{ marginBottom: "12px" }}>Admin panel</h3>
+      {/* MAIN WORKSPACE */}
+      <main
+        style={{
+          marginTop: 50,
+          padding: 32,
+          background: "#f7f7f7",
+          minHeight: "100vh",
+          marginLeft: adminOpen ? ADMIN_WIDTH : 0,
+          transition: "margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
+        <h1>Teamfloor</h1>
+        <p>See your team. Talk instantly.</p>
 
-          <button
-            onClick={addDesk}
-            style={{
-              width: "100%",
-              marginBottom: "16px",
-              padding: "8px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-              backgroundColor: "#f5f5f5",
-              cursor: "pointer",
-            }}
-          >
-            + Add user
-          </button>
-
-          {desks.map((desk) => (
-            <div
-              key={desk.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "10px",
-                fontSize: "14px",
-              }}
-            >
-              <span>{desk.name}</span>
-
-              <button
-                onClick={() => toggleDeskStatus(desk.id)}
-                style={{
-                  padding: "4px 8px",
-                  fontSize: "12px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  backgroundColor:
-                    desk.status === "active"
-                      ? "#e8f8f0"
-                      : "#f2f2f2",
-                  cursor: "pointer",
-                }}
-              >
-                {desk.status === "active" ? "Active" : "Inactive"}
-              </button>
-            </div>
-          ))}
-        </aside>
-      )}
-    </main>
+        <OfficeCanvas desks={desks} />
+      </main>
+    </>
   );
 }
