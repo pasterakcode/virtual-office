@@ -1,93 +1,73 @@
-"use client";
-
-import type { Desk, DeskPresence } from "@/types/desk";
-
-const statusColor: Record<DeskPresence, string> = {
-  online: "#2ecc71",
-  busy: "#f39c12",
-  offline: "#bdc3c7",
-};
+import type { Desk } from "@/types/desk";
 
 export default function DeskCard({ desk }: { desk: Desk }) {
   const isOffline = desk.presence === "offline";
 
-  const handleClick = () => {
-    console.log("CLICK", desk);
-
-    if (isOffline) {
-      console.log("BLOCK: offline");
-      return;
-    }
-
-    if (!desk.slackUserId) {
-      console.log("BLOCK: no slackUserId");
-      return;
-    }
-
-    window.open(
-      `https://slack.com/app_redirect?channel=${desk.slackUserId}`,
-      "_blank"
-    );
-  };
-
   return (
     <div
-      onClick={handleClick}
       style={{
-        padding: 24,
-        borderRadius: 18,
+        padding: 20,
+        borderRadius: 16,
         background: "#fff",
-        border: "1px solid #e5e5e5",
-        boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
-        opacity: isOffline ? 0.35 : 1,
+        opacity: isOffline ? 0.5 : 1,
+        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
         cursor: isOffline ? "default" : "pointer",
-        transition: "all 0.2s ease",
       }}
     >
+      {/* Avatar / initial */}
       <div
         style={{
-          width: 56,
-          height: 56,
+          width: 48,
+          height: 48,
           borderRadius: "50%",
-          background: statusColor[desk.presence],
+          background: isOffline ? "#ddd" : "#22c55e",
+          color: "#fff",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          color: "#fff",
-          fontWeight: 600,
-          fontSize: 20,
+          fontWeight: 700,
+          fontSize: 18,
         }}
       >
-        {desk.name.charAt(0)}
+        {desk.name.charAt(0).toUpperCase()}
       </div>
 
-      <div style={{ marginTop: 16 }}>
-        <div style={{ fontWeight: 600, fontSize: 16 }}>
-          {desk.name}
-        </div>
+      {/* Name */}
+      <strong style={{ fontSize: 16 }}>{desk.name}</strong>
 
+      {/* Presence label */}
+      <span
+        style={{
+          fontSize: 12,
+          color: "#666",
+        }}
+      >
+        {desk.presence}
+      </span>
+
+      {/* ✅ STATUS — ZAWSZE, NIEZALEŻNIE OD PRESENCE */}
+      {(desk.status_text || desk.status_emoji) && (
         <div
           style={{
-            marginTop: 6,
+            marginTop: 4,
             fontSize: 13,
-            color: isOffline ? "#999" : "#333",
+            color: "#333",
+            display: "flex",
+            alignItems: "center",
+            gap: 6,
           }}
         >
-          {desk.presence}
+          {desk.status_emoji && (
+            <span>{desk.status_emoji}</span>
+          )}
+          {desk.status_text && (
+            <span>{desk.status_text}</span>
+          )}
         </div>
-
-        {!isOffline && (
-          <div
-            style={{
-              marginTop: 8,
-              fontSize: 12,
-              color: "#2563eb",
-            }}
-          >
-            {desk.presence === "busy" ? "View status" : "Talk"}
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 }
