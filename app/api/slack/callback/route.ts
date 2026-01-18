@@ -14,7 +14,7 @@ export async function GET(req: Request) {
         { status: 400 }
       );
     }
-
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
     const clientId = process.env.SLACK_CLIENT_ID;
     const clientSecret = process.env.SLACK_CLIENT_SECRET;
     const redirectUri = process.env.SLACK_REDIRECT_URI;
