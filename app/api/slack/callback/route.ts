@@ -18,7 +18,7 @@ export async function GET(req: Request) {
     const clientId = process.env.SLACK_CLIENT_ID;
     const clientSecret = process.env.SLACK_CLIENT_SECRET;
     const redirectUri = process.env.SLACK_REDIRECT_URI;
-    const appUrl = process.env.APP_URL;
+
 
     if (!clientId || !clientSecret || !redirectUri || !appUrl) {
       console.error("[SLACK CALLBACK] Missing env vars", {
