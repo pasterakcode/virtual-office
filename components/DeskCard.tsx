@@ -1,73 +1,115 @@
-import type { Desk } from "@/types/desk";
+"use client";
+
+import type { Desk, DeskPresence } from "@/types/desk";
+
+const statusColor: Record<DeskPresence, string> = {
+  online: "#2ecc71",
+  busy: "#f39c12",
+  offline: "#bdc3c7",
+};
 
 export default function DeskCard({ desk }: { desk: Desk }) {
   const isOffline = desk.presence === "offline";
 
+  const handleClick = () => {
+    console.log("CLICK", desk);
+
+    if (isOffline) {
+      console.log("BLOCK: offline");
+      return;
+    }
+
+    if (!desk.slackUserId) {
+      console.log("BLOCK: no slackUserId");
+      return;
+    }
+
+    window.open(
+      `https://slack.com/app_redirect?channel=${desk.slackUserId}`,
+      "_blank"
+    );
+  };
+
   return (
     <div
+      onClick={handleClick}
       style={{
-        padding: 20,
-        borderRadius: 16,
+        padding: 24,
+        borderRadius: 18,
         background: "#fff",
-        opacity: isOffline ? 0.5 : 1,
-        boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
+        border: "1px solid #e5e5e5",
+        boxShadow: "0 6px 20px rgba(0,0,0,0.06)",
+        opacity: isOffline ? 0.35 : 1,
         cursor: isOffline ? "default" : "pointer",
+        transition: "all 0.2s ease",
       }}
     >
-      {/* Avatar / initial */}
+      {/* Avatar */}
       <div
         style={{
-          width: 48,
-          height: 48,
+          width: 56,
+          height: 56,
           borderRadius: "50%",
-          background: isOffline ? "#ddd" : "#22c55e",
-          color: "#fff",
+          background: statusColor[desk.presence],
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          fontWeight: 700,
-          fontSize: 18,
+          color: "#fff",
+          fontWeight: 600,
+          fontSize: 20,
         }}
       >
-        {desk.name.charAt(0).toUpperCase()}
+        {desk.name.charAt(0)}
       </div>
 
-      {/* Name */}
-      <strong style={{ fontSize: 16 }}>{desk.name}</strong>
+      <div style={{ marginTop: 16 }}>
+        {/* Name */}
+        <div style={{ fontWeight: 600, fontSize: 16 }}>
+          {desk.name}
+        </div>
 
-      {/* Presence label */}
-      <span
-        style={{
-          fontSize: 12,
-          color: "#666",
-        }}
-      >
-        {desk.presence}
-      </span>
-
-      {/* ✅ STATUS — ZAWSZE, NIEZALEŻNIE OD PRESENCE */}
-      {(desk.status_text || desk.status_emoji) && (
+        {/* Presence */}
         <div
           style={{
-            marginTop: 4,
+            marginTop: 6,
             fontSize: 13,
-            color: "#333",
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
+            color: isOffline ? "#999" : "#333",
           }}
         >
-          {desk.status_emoji && (
-            <span>{desk.status_emoji}</span>
-          )}
-          {desk.status_text && (
-            <span>{desk.status_text}</span>
-          )}
+          {desk.presence}
         </div>
-      )}
+
+        {/* ✅ STATUS ZE SLACKA — ZAWSZE, NIEZALEŻNIE OD PRESENCE */}
+        {(desk.status_text || desk.status_emoji) && (
+          <div
+            style={{
+              marginTop: 8,
+              fontSize: 13,
+              color: "#111",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              lineHeight: 1.3,
+            }}
+          >
+            {desk.status_emoji && <span>{desk.status_emoji}</span>}
+            {desk.status_text && <span>{desk.status_text}</span>}
+          </div>
+        )}
+
+        {/* CTA */}
+        {!isOffline && (
+          <div
+            style={{
+              marginTop: 10,
+              fontSize: 12,
+              color: "#2563eb",
+            }}
+          >
+            {desk.presence === "busy" ? "View status" : "Talk"}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
