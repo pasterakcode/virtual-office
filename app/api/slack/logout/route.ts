@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase-server";
+import { supabaseServer } from "@/lib/supabase-server";
 
 export async function POST() {
-  const supabase = createServerClient();
+  const supabase = supabaseServer();
 
   const { error } = await supabase
     .from("slack_installations")
