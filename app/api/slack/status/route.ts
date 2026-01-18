@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerClient } from "@/lib/supabase-server";
+import { supabaseServer } from "@/lib/supabase-server";
 
 export async function GET() {
   const supabase = createServerClient();
@@ -18,4 +18,3 @@ export async function GET() {
     connected: !!data,
   });
 }
-
