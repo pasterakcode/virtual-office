@@ -23,7 +23,7 @@ export default function Home() {
       console.log("[Home] desks loaded:", data, error);
 
       const normalized: Desk[] = (data ?? []).map((d) => ({
-        id: d.id,
+        id: d.slack_user_id ?? d.id,
         name: d.name,
         presence:
           d.presence === "online" || d.presence === "busy"

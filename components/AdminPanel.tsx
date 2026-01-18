@@ -43,11 +43,14 @@ export default function AdminPanel() {
     if (!slackConnected) return;
 
     const loadDesks = async () => {
-      const { data } = await supabase.from("desks").select("id");
+      const { data } = await supabase
+        .from("desks")
+        .select("id, slack_user_id");
 
       const map: Record<string, boolean> = {};
       (data ?? []).forEach((d) => {
-        map[d.id] = true;
+        const slackId = d.slack_user_id ?? d.id;
+        map[slackId] = true;
       });
 
       setSelected(map);
@@ -193,14 +196,21 @@ export default function AdminPanel() {
                 }));
 
                 if (checked) {
-                  await supabase.from("desks").upsert({
-                    id: u.id,
-                    slack_user_id: u.id,
-                    name: u.name,
-                    presence: "offline",
-                  });
+                  await supabase
+                    .from("desks")
+                    .upsert(
+                      {
+                        slack_user_id: u.id,
+                        name: u.name,
+                        presence: "offline",
+                      },
+                      { onConflict: "slack_user_id" }
+                    );
                 } else {
-                  await supabase.from("desks").delete().eq("id", u.id);
+                  await supabase
+                    .from("desks")
+                    .delete()
+                    .eq("slack_user_id", u.id);
                 }
               }}
             />

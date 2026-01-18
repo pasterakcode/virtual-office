@@ -29,7 +29,7 @@ export async function POST() {
   // 2️⃣ Pobierz wszystkie biurka
   const { data: desks, error: desksError } = await supabaseServer
     .from("desks")
-    .select("id");
+    .select("id, slack_user_id");
 
   if (desksError || !desks) {
     return NextResponse.json(
@@ -40,9 +40,11 @@ export async function POST() {
 
   // 3️⃣ Aktualizuj presence + status dla każdego usera
   for (const desk of desks) {
+    const slackUserId = desk.slack_user_id ?? desk.id;
+
     /* ---------- PRESENCE (BOT TOKEN) ---------- */
     const presenceRes = await fetch(
-      `https://slack.com/api/users.getPresence?user=${desk.id}`,
+      `https://slack.com/api/users.getPresence?user=${slackUserId}`,
       {
         headers: {
           Authorization: `Bearer ${botToken}`,
@@ -62,7 +64,7 @@ export async function POST() {
 
     /* ---------- CUSTOM STATUS (USER TOKEN) ---------- */
     const profileRes = await fetch(
-      `https://slack.com/api/users.profile.get?user=${desk.id}`,
+      `https://slack.com/api/users.profile.get?user=${slackUserId}`,
       {
         headers: {
           Authorization: `Bearer ${userToken}`,
