@@ -1,12 +1,18 @@
 import { NextResponse } from "next/server";
-import { supabaseServer } from "@/lib/supabase-server";
+import { createServerClient } from "@/lib/supabase-server";
 
 export async function GET() {
-  const { data } = await supabaseServer
-    .from("slack_auth")
+  const supabase = createServerClient();
+
+  const { data, error } = await supabase
+    .from("slack_installations")
     .select("id")
-    .limit(1)
-    .single();
+    .maybeSingle();
+
+  if (error) {
+    console.error("[SLACK STATUS ERROR]", error);
+    return NextResponse.json({ connected: false });
+  }
 
   return NextResponse.json({
     connected: !!data,
