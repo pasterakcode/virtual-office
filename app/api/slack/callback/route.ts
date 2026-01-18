@@ -3,19 +3,6 @@ import { supabaseServer } from "@/lib/supabase-server";
 
 export async function GET(req: Request) {
   try {
-    const missingEnv = [
-      "SLACK_CLIENT_ID",
-      "SLACK_CLIENT_SECRET",
-      "SLACK_REDIRECT_URI",
-    ].filter((key) => !process.env[key]);
-
-    if (missingEnv.length > 0) {
-      return NextResponse.json(
-        { error: "missing slack env vars", missing: missingEnv },
-        { status: 500 }
-      );
-    }
-
     const { searchParams } = new URL(req.url);
     const code = searchParams.get("code");
 
