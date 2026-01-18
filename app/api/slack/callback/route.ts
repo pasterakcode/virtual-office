@@ -38,46 +38,34 @@ export async function GET(req: Request) {
       );
     }
 
-    /**
-     * Slack OAuth v2 response contains:
-     * - data.access_token           → USER token (xoxp-)
-     * - data.bot.bot_access_token   → BOT token  (xoxb-)
-     */
-    const userAccessToken = data.access_token;
-    const botAccessToken = data.bot?.bot_access_token;
+    // 🔑 Dane, które MOGĄ być null — i to jest OK
+    const userAccessToken = data.access_token ?? null; // xoxp-
+    const botAccessToken = data.bot?.bot_access_token ?? null; // xoxb-
 
-    if (!userAccessToken || !botAccessToken) {
-      return NextResponse.json(
-        {
-          error: "Missing Slack tokens",
-          userAccessTokenExists: !!userAccessToken,
-          botAccessTokenExists: !!botAccessToken,
-        },
-        { status: 500 }
-      );
-    }
+    const teamId = data.team?.id ?? null;
+    const teamName = data.team?.name ?? null;
 
-    // 💾 Save tokens in Supabase
+    // 💾 ZAWSZE zapisujemy wiersz
     const { error } = await supabaseServer.from("slack_auth").insert({
-      team_id: data.team.id,
-      team_name: data.team.name,
+      team_id: teamId,
+      team_name: teamName,
 
-      // USER TOKEN → custom status
       user_access_token: userAccessToken,
-
-      // BOT TOKEN → presence
       bot_access_token: botAccessToken,
+
+      // pomocniczo – debug
+      raw_oauth_response: data,
     });
 
     if (error) {
       console.error("SUPABASE INSERT ERROR", error);
       return NextResponse.json(
-        { error: "Database error", details: error },
+        { error: "Database insert failed", details: error },
         { status: 500 }
       );
     }
 
-    // 🚀 Redirect back to Admin panel
+    // 🚀 Redirect do Admin Panelu
     return NextResponse.redirect(
       new URL("/admin", process.env.NEXT_PUBLIC_APP_URL!)
     );
