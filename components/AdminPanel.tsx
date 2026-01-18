@@ -196,21 +196,35 @@ export default function AdminPanel() {
                 }));
 
                 if (checked) {
-                  await supabase
+                  const { data: existingDesk } = await supabase
                     .from("desks")
-                    .upsert(
-                      {
+                    .select("id")
+                    .eq("slack_user_id", u.id)
+                    .maybeSingle();
+
+                  if (existingDesk?.id) {
+                    await supabase
+                      .from("desks")
+                      .update({
+                        name: u.name,
+                        presence: "offline",
+                      })
+                      .eq("id", existingDesk.id);
+                  } else {
+                    await supabase
+                      .from("desks")
+                      .insert({
+                        id: u.id,
                         slack_user_id: u.id,
                         name: u.name,
                         presence: "offline",
-                      },
-                      { onConflict: "slack_user_id" }
-                    );
+                      });
+                  }
                 } else {
                   await supabase
                     .from("desks")
                     .delete()
-                    .eq("slack_user_id", u.id);
+                    .or(`slack_user_id.eq.${u.id},id.eq.${u.id}`);
                 }
               }}
             />
