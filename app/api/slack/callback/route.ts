@@ -56,14 +56,17 @@ export async function GET(req: Request) {
       return NextResponse.json(data, { status: 400 });
     }
 
-    const { error } = await supabaseServer.from("slack_auth").insert({
-      team_id: data.team.id,
-      team_name: data.team.name,
-      access_token: data.access_token,
-      scope: data.scope,
-      installed_at: new Date().toISOString(),
-    });
+const { error } = await supabaseServer
+  .from("slack_auth")
+  .insert({
+    team_id: data.team.id,
+    team_name: data.team.name,
+    access_token: data.access_token,                 // bot token
+    bot_access_token: data.access_token,             // jawnie
+    user_access_token: data.authed_user?.access_token ?? null,
+  });
 
+    
     if (error) {
       console.error("[SUPABASE ERROR]", error);
       return NextResponse.json(
