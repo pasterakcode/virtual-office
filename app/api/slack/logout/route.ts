@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase-server";
 
 export async function POST() {
-  const supabase = supabaseServer();
+const supabase = supabaseServer;
+
 
   const { error } = await supabase
     .from("slack_installations")
