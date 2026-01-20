@@ -1,37 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-1
+# Teamfloor
 
-## Getting Started
+## Opis projektu
+Teamfloor to aplikacja webowa do wizualizacji obecności zespołu oraz komunikacji opartej na integracji ze Slackiem.
 
-First, run the development server:
+## Architektura projektu
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### 1. Frontend
+- Stworzony przy użyciu frameworka Next.js (React).
+- Główne komponenty:
+  - **OfficeCanvas** - wizualizacja stanowisk zespołu (desks).
+  - **DeskCard** i **Desk** - reprezentacja pojedynczego stanowiska z informacją o obecności (presence), statusie i liczbie nieprzeczytanych wiadomości.
+  - **AdminPanel** - panel administracyjny do zarządzania dostępem użytkowników poprzez integrację z Slackiem.
+- Stylowanie jest realizowane częściowo inline oraz poprzez globalne style.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Backend
+- Next.js API routes pełnią funkcję backendu:
+  - `/api/slack/login` - rozpoczęcie procesu OAuth dla Slacka.
+  - `/api/slack/callback` - odbiór i obsługa callbacka OAutha Slacka, zapis instalacji w bazie.
+  - `/api/slack/logout` - usunięcie instalacji Slacka z bazy.
+  - `/api/slack/status` - sprawdzenie statusu połączenia z Slackiem.
+  - `/api/slack/users` - pobranie listy użytkowników Slacka przez token zapisany w bazie.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Baza danych
+- Używane jest Supabase jako warstwa bazy danych i backend-as-a-service.
+- Dwie główne tabele:
+  - `desks` - przechowuje informacje o stanowiskach zespołu (id, nazwa, obecność, slackUserId, status).
+  - `slack_auth` i `slack_installations` - do przechowywania autoryzacji i instalacji Slack OAuth.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 4. Integracja z Slackiem
+- OAuth 2.0 do uwierzytelniania użytkownika i aplikacji.
+- Tokeny są zapisywane na backendzie z pełnymi uprawnieniami (bot i user tokeny).
+- Dane użytkowników Slack są pobierane i mapowane na stanowiska w aplikacji.
 
-## Learn More
+### 5. Aktualizacje w czasie rzeczywistym
+- Supabase Realtime służy do nasłuchiwania zmian w tabeli `desks` i natychmiastowego aktualizowania widoku frontendu.
 
-To learn more about Next.js, take a look at the following resources:
+### 6. Inne
+- Środowisko i konfiguracja opierają się na zmiennych środowiskowych (np. klucze Slack, Supabase).
+- Komponenty React działają z flagą "use client" dla interakcji i efektów.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Podsumowanie
+Projekt jest klasycznym przykładem aplikacji fullstack opartej na Next.js z backendem realizowanym przez API routes i korzystaniu z Supabase jako backend BaaS. Integracja z zewnętrznym API (Slack) umożliwia rozszerzenie funkcji o autoryzację i dane użytkowników. Real-time updates zapewniają dynamiczną i responsywną interakcję użytkownika.
