@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import OfficeCanvas from "@/components/OfficeCanvas";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/components/AuthProvider";
+import type { Desk } from "@/types/desk";
 
 export default function HomePage() {
   const { user, loading } = useAuth();
-  const [desks, setDesks] = useState([]);
+  const [desks, setDesks] = useState<Desk[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -18,10 +19,10 @@ export default function HomePage() {
     async function fetchDesks() {
       const { data, error } = await supabase.from("desks").select("*");
 
-      if (error) {
+      if (error || !data) {
         setDesks([]);
       } else {
-        setDesks(data);
+        setDesks(data as Desk[]);
       }
     }
 
