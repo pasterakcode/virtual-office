@@ -29,6 +29,10 @@ export default function HomePage() {
     fetchDesks();
   }, [user]);
 
+  // Added console log for user and desks length
+  console.log("[HomePage] user:", user);
+  console.log("[HomePage] desks.length:", desks.length);
+
   if (loading) {
     return <div>Loading...</div>;
   }

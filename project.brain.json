@@ -28,6 +28,11 @@
       "date": "2026-01-24T17:03:09.117Z",
       "mode": "goal",
       "goal": "Zaimplementuj w app/api/slack/callback/route.ts server-side tworzenie sesji Supabase Auth dla custom Slack OAuth przy użyciu Supabase Admin API i magic link (generateLink). Cookie sesji ma być ustawione w odpowiedzi HTTP, a użytkownik przekierowany do '/' po zalogowaniu."
+    },
+    {
+      "date": "2026-01-24T17:54:03.171Z",
+      "mode": "goal",
+      "goal": "Dodaj wyłącznie console.log (bez zmiany logiki aplikacji), które pozwolą jednoznacznie ustalić: (1) czy użytkownik jest zalogowany w Supabase (czy useAuth() otrzymuje user), (2) czy po zalogowaniu wykonywane jest pobranie danych z Slacka, (3) czy API /api/slack/users faktycznie zwraca listę użytkowników. Logi dodaj w: AuthProvider.tsx (stan user i loading), app/page.tsx (wartość user i desks.length), app/api/slack/users/route.ts (czy istnieje slack_auth i ile użytkowników zwraca Slack API). Nie zmieniaj istniejącej logiki ani struktury kodu."
     }
   ],
   "decisions": [
@@ -110,6 +115,22 @@
         "deleted": []
       },
       "summary": "add:0, modify:1, delete:0"
+    },
+    {
+      "date": "2026-01-24T17:54:03.172Z",
+      "mode": "goal",
+      "goal": "Dodaj wyłącznie console.log (bez zmiany logiki aplikacji), które pozwolą jednoznacznie ustalić: (1) czy użytkownik jest zalogowany w Supabase (czy useAuth() otrzymuje user), (2) czy po zalogowaniu wykonywane jest pobranie danych z Slacka, (3) czy API /api/slack/users faktycznie zwraca listę użytkowników. Logi dodaj w: AuthProvider.tsx (stan user i loading), app/page.tsx (wartość user i desks.length), app/api/slack/users/route.ts (czy istnieje slack_auth i ile użytkowników zwraca Slack API). Nie zmieniaj istniejącej logiki ani struktury kodu.",
+      "force": false,
+      "effect": {
+        "added": [],
+        "modified": [
+          "components/AuthProvider.tsx",
+          "app/page.tsx",
+          "app/api/slack/users/route.ts"
+        ],
+        "deleted": []
+      },
+      "summary": "add:0, modify:3, delete:0"
     }
   ]
 }

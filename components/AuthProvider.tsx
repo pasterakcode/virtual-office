@@ -69,6 +69,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .catch(() => setWorkspace(null));
   }, [user]);
 
+  // Added console log for user and loading state
+  console.log("[AuthProvider] user:", user);
+  console.log("[AuthProvider] loading:", loading);
+
   return (
     <AuthContext.Provider value={{ user, loading, workspace }}>
       {children}
