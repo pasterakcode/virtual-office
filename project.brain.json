@@ -23,6 +23,11 @@
       "date": "2026-01-24T15:14:57.467Z",
       "mode": "goal",
       "goal": "Zaktualizuj app/admin/page.tsx tak, aby renderował nowy komponent kliencki (ClientAdminPanel), zamiast bezpośrednio renderować AdminPanel. Strona /admin ma pozostać Server Componentem"
+    },
+    {
+      "date": "2026-01-24T17:03:09.117Z",
+      "mode": "goal",
+      "goal": "Zaimplementuj w app/api/slack/callback/route.ts server-side tworzenie sesji Supabase Auth dla custom Slack OAuth przy użyciu Supabase Admin API i magic link (generateLink). Cookie sesji ma być ustawione w odpowiedzi HTTP, a użytkownik przekierowany do '/' po zalogowaniu."
     }
   ],
   "decisions": [
@@ -87,6 +92,20 @@
         "added": [],
         "modified": [
           "app/admin/page.tsx"
+        ],
+        "deleted": []
+      },
+      "summary": "add:0, modify:1, delete:0"
+    },
+    {
+      "date": "2026-01-24T17:03:09.117Z",
+      "mode": "goal",
+      "goal": "Zaimplementuj w app/api/slack/callback/route.ts server-side tworzenie sesji Supabase Auth dla custom Slack OAuth przy użyciu Supabase Admin API i magic link (generateLink). Cookie sesji ma być ustawione w odpowiedzi HTTP, a użytkownik przekierowany do '/' po zalogowaniu.",
+      "force": false,
+      "effect": {
+        "added": [],
+        "modified": [
+          "app/api/slack/callback/route.ts"
         ],
         "deleted": []
       },
