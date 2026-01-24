@@ -79,10 +79,12 @@ export async function GET(req: Request) {
     const email = `${data.team.name.replace(/\s+/g, '').toLowerCase()}@slack.local`;
 
     // Generate magic link for this user
-    const { data: magicLinkData, error: magicLinkError } = await supabaseServer.auth.admin.generateLink({
-      email,
-      redirectTo: appUrl + "/",
-    });
+    const { data: magicLinkData, error: magicLinkError } =
+  await supabaseServer.auth.admin.generateLink({
+    type: "magiclink",
+    email,
+  });
+
 
     if (magicLinkError) {
       console.error("[SUPABASE MAGIC LINK ERROR]", magicLinkError);
