@@ -8,6 +8,21 @@
     {
       "date": "2026-01-21T22:44:08.693Z",
       "goal": "zrób audyt tego projektu – widzisz jakieś błędy?"
+    },
+    {
+      "date": "2026-01-24T14:27:41.473Z",
+      "mode": "goal",
+      "goal": "Utwórz nowy komponent kliencki (np. components/ClientAdminPanel.tsx) z dyrektywą 'use client', do którego przeniesiesz wywołanie hooka useAuth(). Ten komponent ma renderować istniejący AdminPanel i przekazywać do niego dane auth przez props. Nie modyfikuj jeszcze app/admin/page.tsx."
+    },
+    {
+      "date": "2026-01-24T14:53:48.358Z",
+      "mode": "goal",
+      "goal": "Zmodyfikuj components/AdminPanel.tsx tak, aby NIE wywoływał hooka useAuth(). Komponent ma otrzymywać wszystkie dane związane z autoryzacją wyłącznie przez props."
+    },
+    {
+      "date": "2026-01-24T15:14:57.467Z",
+      "mode": "goal",
+      "goal": "Zaktualizuj app/admin/page.tsx tak, aby renderował nowy komponent kliencki (ClientAdminPanel), zamiast bezpośrednio renderować AdminPanel. Strona /admin ma pozostać Server Componentem"
     }
   ],
   "decisions": [
@@ -35,6 +50,47 @@
         "deleted": []
       },
       "summary": "add:2, modify:0, delete:0"
+    },
+    {
+      "date": "2026-01-24T14:27:41.473Z",
+      "mode": "goal",
+      "goal": "Utwórz nowy komponent kliencki (np. components/ClientAdminPanel.tsx) z dyrektywą 'use client', do którego przeniesiesz wywołanie hooka useAuth(). Ten komponent ma renderować istniejący AdminPanel i przekazywać do niego dane auth przez props. Nie modyfikuj jeszcze app/admin/page.tsx.",
+      "effect": {
+        "added": [
+          "components/ClientAdminPanel.tsx"
+        ],
+        "modified": [],
+        "deleted": []
+      },
+      "summary": "add:1, modify:0, delete:0"
+    },
+    {
+      "date": "2026-01-24T14:53:48.359Z",
+      "mode": "goal",
+      "goal": "Zmodyfikuj components/AdminPanel.tsx tak, aby NIE wywoływał hooka useAuth(). Komponent ma otrzymywać wszystkie dane związane z autoryzacją wyłącznie przez props.",
+      "force": true,
+      "effect": {
+        "added": [],
+        "modified": [
+          "components/AdminPanel.tsx"
+        ],
+        "deleted": []
+      },
+      "summary": "add:0, modify:1, delete:0"
+    },
+    {
+      "date": "2026-01-24T15:14:57.467Z",
+      "mode": "goal",
+      "goal": "Zaktualizuj app/admin/page.tsx tak, aby renderował nowy komponent kliencki (ClientAdminPanel), zamiast bezpośrednio renderować AdminPanel. Strona /admin ma pozostać Server Componentem",
+      "force": true,
+      "effect": {
+        "added": [],
+        "modified": [
+          "app/admin/page.tsx"
+        ],
+        "deleted": []
+      },
+      "summary": "add:0, modify:1, delete:0"
     }
   ]
 }

@@ -9,11 +9,17 @@ type SlackUser = {
   email: string;
 };
 
-export default function AdminPanel() {
+interface AdminPanelProps {
+  user: { id: string; email?: string } | null;
+  loading: boolean;
+  workspace: { team_name?: string } | null;
+}
+
+export default function AdminPanel({ user, loading, workspace }: AdminPanelProps) {
   const [users, setUsers] = useState<SlackUser[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [slackConnected, setSlackConnected] = useState<boolean | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loadingUsers, setLoadingUsers] = useState(true);
 
   // 🔴 LOGOUT FROM SLACK
   const logoutSlack = async () => {
@@ -33,10 +39,10 @@ export default function AdminPanel() {
     setSlackConnected(false);
     setUsers([]);
     setSelected({});
-    setLoading(true);
+    setLoadingUsers(true);
   };
 
-  // 1️⃣ check slack connection status
+  // 1⃣ check slack connection status
   useEffect(() => {
     fetch("/api/slack/status")
       .then((r) => r.json())
@@ -45,11 +51,11 @@ export default function AdminPanel() {
       });
   }, []);
 
-  // 2️⃣ load slack users
+  // 2⃣ load slack users
   useEffect(() => {
     if (slackConnected !== true) return;
 
-    setLoading(true);
+    setLoadingUsers(true);
 
     fetch("/api/slack/users")
       .then((r) => r.json())
@@ -59,11 +65,11 @@ export default function AdminPanel() {
         } else {
           setUsers([]);
         }
-        setLoading(false);
+        setLoadingUsers(false);
       });
   }, [slackConnected]);
 
-  // 3️⃣ load existing desks
+  // 3⃣ load existing desks
   useEffect(() => {
     if (slackConnected !== true) return;
 
@@ -87,6 +93,21 @@ export default function AdminPanel() {
 
     loadDesks();
   }, [slackConnected]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!user) {
+    return (
+      <div style={{ padding: 24 }}>
+        <h1>Please log in to access the admin panel</h1>
+        <a href="/login" style={{ color: '#4A154B', fontWeight: 'bold', textDecoration: 'underline' }}>
+          Login with Slack
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -142,10 +163,10 @@ export default function AdminPanel() {
         </button>
       )}
 
-      {slackConnected === true && loading && <p>Loading users…</p>}
+      {slackConnected === true && loadingUsers && <p>Loading users…</p>}
 
       {slackConnected === true &&
-        !loading &&
+        !loadingUsers &&
         users.map((u) => (
           <label
             key={u.id}
@@ -199,4 +220,3 @@ export default function AdminPanel() {
     </div>
   );
 }
-
