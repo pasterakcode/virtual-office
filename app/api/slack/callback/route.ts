@@ -99,12 +99,26 @@ export async function GET(req: Request) {
     // so we simulate login by redirecting user to magic link URL.
 
     // Redirect user to magic link URL to complete login
-    return NextResponse.redirect(new URL("/", appUrl), {
-      headers: {
-        // Set cookie with magic link token for session (optional, depends on Supabase setup)
-        // Here we do not set cookie manually because magic link flow is client-driven
-      },
-    });
+   // 1. Pobierz magic link URL
+const magicLink = magicLinkData.properties.action_link;
+
+// 2. Server-side "kliknięcie" magic linka
+const magicResponse = await fetch(magicLink, {
+  method: "GET",
+  redirect: "manual",
+});
+
+// 3. Przenieś cookie z odpowiedzi Supabase do przeglądarki
+const setCookie = magicResponse.headers.get("set-cookie");
+
+const response = NextResponse.redirect(new URL("/", appUrl));
+
+if (setCookie) {
+  response.headers.set("set-cookie", setCookie);
+}
+
+return response;
+
   } catch (e) {
     console.error("[CALLBACK CRASH]", e);
     return NextResponse.json(
