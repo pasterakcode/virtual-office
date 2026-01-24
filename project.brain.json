@@ -1,0 +1,40 @@
+{
+  "goal": "zrób audyt tego projektu – widzisz jakieś błędy?",
+  "history": [
+    {
+      "date": "2026-01-21T22:41:27.649Z",
+      "goal": "zrób audyt tego projektu – widzisz jakieś błędy?"
+    },
+    {
+      "date": "2026-01-21T22:44:08.693Z",
+      "goal": "zrób audyt tego projektu – widzisz jakieś błędy?"
+    }
+  ],
+  "decisions": [
+    {
+      "date": "2026-01-21T22:41:31.388Z",
+      "goal": "zrób audyt tego projektu – widzisz jakieś błędy?",
+      "effect": {
+        "added": [],
+        "modified": [
+          "projects/virtual-office/README.md"
+        ],
+        "deleted": []
+      },
+      "summary": "add:0, modify:1, delete:0"
+    },
+    {
+      "date": "2026-01-21T22:41:51.469Z",
+      "goal": "Przeprowadź statyczną analizę kodu w projekcie virtual-office, aby wykryć potencjalne błędy i problemy ze stylem.",
+      "effect": {
+        "added": [
+          "projects/virtual-office/.eslintrc.json",
+          "projects/virtual-office/.prettierrc"
+        ],
+        "modified": [],
+        "deleted": []
+      },
+      "summary": "add:2, modify:0, delete:0"
+    }
+  ]
+}
