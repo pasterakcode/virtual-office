@@ -81,9 +81,12 @@ export async function GET(req: Request) {
     // Generate magic link for this user
     const { data: magicLinkData, error: magicLinkError } =
   await supabaseServer.auth.admin.generateLink({
-    type: "magiclink",
-    email,
-  });
+  type: "magiclink",
+  email,
+  options: {
+    redirectTo: `${appUrl}/auth/callback-complete`,
+  },
+});
 
 
     if (magicLinkError) {
@@ -100,24 +103,12 @@ export async function GET(req: Request) {
 
     // Redirect user to magic link URL to complete login
    // 1. Pobierz magic link URL
+
+
+// Redirect user to magic link URL to complete login
 const magicLink = magicLinkData.properties.action_link;
+return NextResponse.redirect(magicLink);
 
-// 2. Server-side "kliknięcie" magic linka
-const magicResponse = await fetch(magicLink, {
-  method: "GET",
-  redirect: "manual",
-});
-
-// 3. Przenieś cookie z odpowiedzi Supabase do przeglądarki
-const setCookie = magicResponse.headers.get("set-cookie");
-
-const response = NextResponse.redirect(new URL("/", appUrl));
-
-if (setCookie) {
-  response.headers.set("set-cookie", setCookie);
-}
-
-return response;
 
   } catch (e) {
     console.error("[CALLBACK CRASH]", e);
