@@ -1,3 +1,5 @@
+"use client";
+
 import ClientAdminPanel from '@/components/ClientAdminPanel';
 
 export default function AdminPage() {
