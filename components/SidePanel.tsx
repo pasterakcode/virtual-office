@@ -1,6 +1,8 @@
 "use client";
 
 import { useUI } from "./UIProvider";
+import SlackUsersView from "./panels/SlackUsersView";
+
 
 export default function SidePanel() {
   const { activePanel, closePanel } = useUI();
@@ -46,11 +48,7 @@ export default function SidePanel() {
         </div>
 
         {/* Content placeholder */}
-        {activePanel === "slackUsers" && (
-          <div>
-            <p>Slack users panel (coming next)</p>
-          </div>
-        )}
+       {activePanel === "slackUsers" && <SlackUsersView />}
 
         {activePanel === "admin" && (
           <div>
