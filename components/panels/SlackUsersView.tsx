@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+const [activeUserIds, setActiveUserIds] = useState<string[]>([]);
+
 
 interface SlackUser {
   id: string;
@@ -35,6 +37,16 @@ export default function SlackUsersView() {
     console.log("[SELECTED SLACK USERS]", selectedUserIds);
   }, [selectedUserIds]);
 
+  useEffect(() => {
+  fetch("/api/desks")
+    .then(res => res.json())
+    .then(ids => {
+      console.log("[SlackUsersView] active desks users:", ids);
+      setActiveUserIds(ids);
+    });
+}, []);
+
+
   if (loading) return <p>Loading Slack users…</p>;
 
   if (!users.length) return <p>No Slack users found.</p>;
@@ -56,7 +68,7 @@ export default function SlackUsersView() {
           >
             <input
               type="checkbox"
-              checked={selectedUserIds.includes(user.id)}
+              checked={activeUserIds.includes(user.id)}
               onChange={() => toggleUser(user.id)}
               style={{ marginRight: 8 }}
             />
